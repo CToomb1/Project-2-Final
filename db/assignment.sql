@@ -16,4 +16,3 @@ CREATE TABLE `scheduler`.`assignment` (
     REFERENCES `scheduler`.`employee` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
-© 2020 GitHub, Inc.
