@@ -1,0 +1,38 @@
+{
+  "name": "project-two-final",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CToomb1/Project-2-Final.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CToomb1/Project-2-Final/issues"
+  },
+  "homepage": "https://github.com/CToomb1/Project-2-Final#readme",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "bulma": "^0.8.0",
+    "consola": "^2.11.3",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "inquirer": "^7.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "prettier": "^1.19.1",
+    "sequelize": "^5.21.5"
+  }
+}

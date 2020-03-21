@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script>
+
+    let shiftid = 0;
+
+    function createShifts() {
+      $("#shiftcreatemodal").addClass("is-active");
+      $("#date").val("");
+      $("#start_time").val("");
+      $("#end_time").val("");
+      $("#num_needed").val("");
+      $("#comments").val("");
+    }
+
+    function closeShiftsPopup() {
+      $("#shiftcreatemodal").removeClass("is-active");
+    }
+
+    function handleShiftSave() {
+      let date = $("#date").val();
+      let stime = $("#start_time").val();
+      let etime = $("#end_time").val();
+      let empnum = $("#num_needed").val();
+      let comments = $("#comments").val();
+      let shname = $("#shift_name").val();
+
+      var newShift = {
+        name: shname,
+        date: date,
+        start_time: stime,
+        end_time: etime,
+        number_of_employees: empnum,
+        comments: comments
+      };
+
+      saveShift(newShift).then(function (data) {
+        displayAllShifts();
+      });
+
+      closeShiftsPopup();
+    }
+
+    function displayAllShifts() {
+      getShifts();
+    }
+
+    const getShifts = function () {
+      $.ajax({
+        url: "/api/shifts",
+        method: "GET"
+      }).then(results => {
+        for (var i = 0; i < results.length; i++) {
+          let theid = results[i].id;
+          let name = results[i].name;
+          let day = results[i].day;
+          let sttime = results[i].start_time;
+          let entime = results[i].end_time;
+          let comments = results[i].comments;
+
+          $("<div />", {
+            text: name + ' ' + day + ' ' + sttime + ' ' + entime + ' ' + comments,
+            click: function () {
+              shiftid = theid;
+              showAssignPopup();
+            }
+          }).appendTo("#shplaceholder");
+        }
+      });
+    }
+
+    const saveShift = function (shiftData) {
+      return $.ajax({
+        url: "/api/shifts",
+        data: shiftData,
+        method: "POST"
+      });
+    };
+
+    function populateEmployeeDropdown() {
+      $.ajax({
+        url: "/api/emps",
+        method: "GET"
+      }).then(results => {
+        for (var i = 0; i < results.length; i++) {
+          let empid = results[i].id;
+          let fname = results[i].first_name;
+          let lname = results[i].last_name;
+          let tname = results[i].title;
+
+          $("#empselection").append('<option value=' + empid + '>' + fname + ' ' + lname + '</option>');
+        }
+      });
+    }
+
+    function showAssignPopup() {
+      $("#assignshiftmodal").addClass("is-active");
+    }
+
+    function handleShiftAssign() {
+      let empid = $("#empselection").val();
+      let assignobj = {
+        emp_id: empid,
+        shift_id: shiftid
+      };
+      $.ajax({
+        url: "/api/assignshift",
+        data: assignobj,
+        method: "POST"
+      });
+
+      closeAssignPopup();
+    }
+
+    function closeAssignPopup() {
+      $("#assignshiftmodal").removeClass("is-active");
+    }
+
+    displayAllShifts();
+    populateEmployeeDropdown();
+
+  </script>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <h1 class="is-size-2"><i class="far fa-calendar-alt"></i> Scheduling App</h1>
+      </a>
+
+      <a role="button" class="navbar-burger burger navMobile" aria-label="menu" aria-expanded="false"
+        data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="/employees">
+          Employees
+        </a>
+        <a class="navbar-item" href="/shifts">
+          Shifts
+        </a>
+        <a class="navbar-item" href="/dashboard">
+          Dashboard
+        </a>
+      </div>
+    </div>
+    </div>
+  </nav>
+
+
+  <!-- Create shifts button -->
+  <input type="button" value="Create Shifts" onclick="createShifts()">
+
+  <div id="shiftcreatemodal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Create New Shift</p>
+        <button class="delete" onclick="closeShiftsPopup()" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <input type="text" id="shift_name" placeholder="Shift Name" />
+        <input type="text" id="date" placeholder="Date" />
+        <input type="text" id="start_time" placeholder="Start Time" />
+        <input type="text" id="end_time" placeholder="End Time" />
+        <input type="text" id="num_needed" placeholder="Number of Employees Needed" />
+        <input type="text" id="comments" placeholder="Comments" />
+      </section>
+      <footer class="modal-card-foot">
+        <button onclick="handleShiftSave()" class="button is-success">Save</button>
+        <button onclick="closeShiftsPopup()" class="button">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="assignshiftmodal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Assign Shift</p>
+        <button class="delete" onclick="closeAssignPopup()" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <select id="empselection"></select>
+      </section>
+      <footer class="modal-card-foot">
+        <button onclick="handleShiftAssign()" class="button is-success">Save</button>
+        <button onclick="closeAssignPopup()" class="button">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="shplaceholder"></div>
+
+  <!-- <div class="container">
+    <a class="btn btn-primary btn-lg mt-4" href="/notes" role="button">Get Started</a>
+  </div> -->
+
+  <script src="index.js"></script>
+</body>
+
+</html>

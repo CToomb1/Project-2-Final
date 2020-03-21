@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <style type="text/css">
+        .empRecord {
+            color: red;
+        }
+    </style>
+
+    <script>
+
+        function createEmployees() {
+            $(".modal").addClass("is-active");
+            $("#first_name").val("");
+            $("#last_name").val("");
+            $("#title").val("");
+        }
+        function closeEmployeePopup() {
+            $(".modal").removeClass("is-active");
+        }
+
+        function handleEmpSave() {
+            let fname = $('#first_name').val();
+            let lname = $('#last_name').val();
+            let tname = $('#title').val();
+            //this is where all the checking for empty strings, etc should be done
+            var newEmp = {
+                title: tname,
+                first_name: fname,
+                last_name: lname
+            };
+
+            saveEmp(newEmp).then(function (data) {
+                //getAndRenderEmp();
+                displayAllEmployees()
+            });
+
+            closeEmployeePopup();
+        }
+
+        function displayAllEmployees() {
+            getEmps();
+        }
+
+        const getEmps = function () {
+            // return $.ajax({
+            //    url: "/api/emps",
+            //    method: "GET" 
+            // });
+
+            $.ajax({
+                url: "/api/emps",
+                method: "GET"
+            }).then(results => {
+                for (var i = 0; i < results.length; i++) {
+                    let fname = results[i].first_name;
+                    let lname = results[i].last_name;
+                    let tname = results[i].title;
+
+                    $("<div />", {
+                        text: fname + ' ' + lname + ' ' + tname
+                    }).appendTo("#empplaceholder");
+                }
+            });
+        }
+
+        const saveEmp = function (emp) {
+            return $.ajax({
+                url: "/api/emp",
+                data: emp,
+                method: "POST"
+            });
+        };
+
+        displayAllEmployees();
+
+    </script>
+
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <h1 class="is-size-2"><i class="far fa-calendar-alt"></i> Scheduling App</h1>
+            </a>
+
+            <a role="button" class="navbar-burger burger navMobile" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-end">
+                <a class="navbar-item" href="/employees">
+                    Employees
+                </a>
+                <a class="navbar-item" href="/shifts">
+                    Shifts
+                </a>
+                <a class="navbar-item" href="/dashboard">
+                    Dashboard
+                </a>
+            </div>
+        </div>
+        </div>
+    </nav>
+
+
+    <!-- Create employees button -->
+    <input type="button" value="Create Employees" onclick="createEmployees()">
+
+    <div class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Create New Employee</p>
+                <button class="delete" onclick="closeEmployeePopup()" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <input type="text" id="first_name" placeholder="Employee First Name" />
+                <input type="text" id="last_name" placeholder="Employee Last Name" />
+                <input type="text" id="title" placeholder="Employee Title" />
+            </section>
+            <footer class="modal-card-foot">
+                <button onclick="handleEmpSave()" class="button is-success">Save</button>
+                <button onclick="closeEmployeePopup()" class="button">Cancel</button>
+            </footer>
+        </div>
+    </div>
+
+
+    <div id="empplaceholder">
+
+    </div>
+
+
+    <!-- <div class="container">
+    <a class="btn btn-primary btn-lg mt-4" href="/notes" role="button">Get Started</a>
+  </div> -->
+
+
+</body>
+
+</html>
